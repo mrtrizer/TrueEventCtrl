@@ -6,4 +6,4 @@ HEADERS += $$PWD/event.h \
 
 SOURCES += $$PWD/event.cpp \
 	$$PWD/eventcontroller.cpp \
-	$$PWM/eventsender.cpp
+        $$PWD/eventsender.cpp

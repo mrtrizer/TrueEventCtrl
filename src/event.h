@@ -1,7 +1,9 @@
 #ifndef EVENT_H__
 #define EVENT_H__
 
+#ifndef MONO_THREAD
 #include <pthread.h>
+#endif
 
 class EventSender;
 
@@ -21,7 +23,9 @@ private:
 	EventSender * sender;
 	char * arg;
 	int argLength;
+#ifndef MONO_THREAD
 	pthread_mutex_t argMutex;
+#endif
 };
 
 #endif //EVENT_H__

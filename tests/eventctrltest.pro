@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core testlib
 QT       -= gui
 
 include("../src/eventctrl.pri")
@@ -12,6 +12,8 @@ include("../src/eventctrl.pri")
 TARGET = TrueMsgCtrl
 CONFIG   += console
 CONFIG   -= app_bundle
+
+DEFINES += MONO_THREAD
 
 TEMPLATE = app
 

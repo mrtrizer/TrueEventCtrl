@@ -1,0 +1,3 @@
+The library for providing simple event engine. It can work with multiple threads on unix systems or even without any thread.
+The library doesn't need dependencies.
+Use MONO_THREAD define to work in mono-thread mode. It is useful for pure hardware software and "not save" modes.

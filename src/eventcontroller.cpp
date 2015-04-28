@@ -1,22 +1,34 @@
+#ifndef MONO_THREAD
 #include <pthread.h>
+#endif
 
 #include "eventcontroller.h"
 #include "event.h"
 
+EventController * EventController::ctrl = 0;
+EventController * EventController::monoCtrl = 0;
+
+#ifndef MONO_THREAD
 std::map<pthread_t, EventController *> EventController::ctrls;
+#endif
 
 EventController::EventController()
 {
-	sem_init(&queueSem, 0, 0);
+#ifndef MONO_THREAD
+    sem_init(&queueSem, 0, 0);
     pthread_mutex_init(&queueMutex, NULL);
+#endif
 }
 
 EventController::~EventController()
 {
+#ifndef MONO_THREAD
     sem_destroy(&queueSem);
     pthread_mutex_destroy(&queueMutex);
+#endif
 }
 
+#ifndef MONO_THREAD
 EventController * EventController::getEventCtrl(pthread_t id)
 {
 	EventController * ctrl;
@@ -30,9 +42,25 @@ EventController * EventController::getEventCtrl(pthread_t id)
 	return ctrl;	
 }
 
+#else
+
+EventController * EventController::getEventCtrl()
+{
+    if (monoCtrl == 0)
+        monoCtrl = new EventController();
+    return monoCtrl;
+}
+
+#endif
+
 void EventController::addEventListener(EventSender * sender, void (*handler) (Event * event))
 {
-	EventController * ctrl = getEventCtrl(pthread_self());
+    EventController * ctrl;
+#ifndef MONO_THREAD
+    ctrl = getEventCtrl(pthread_self());
+#else
+    ctrl = getEventCtrl();
+#endif
 	std::list<EventListener>::iterator i;
 	for (i = ctrl->listeners.begin(); i != ctrl->listeners.end(); i++)
         if ((i->sender == sender) && (i->handler == handler))
@@ -42,57 +70,120 @@ void EventController::addEventListener(EventSender * sender, void (*handler) (Ev
 
 void EventController::removeEventSender(EventSender * sender)
 {
+#ifndef MONO_THREAD
     std::map<pthread_t, EventController *>::iterator ctrl;
-    std::list<EventListener>::iterator i;
+
     for (ctrl = ctrls.begin(); ctrl != ctrls.end(); ctrl++)
     {
-        i = ctrl->second->listeners.begin();
-        while (i != ctrl->second->listeners.end())
-        {
-            if (i->sender == sender)
-                i = ctrl->second->listeners.erase(i);
-            else
-                i++;
-        }
+        removeEventSenderCtrl(sender,ctrl->second);
+    }
+#else
+    removeEventSenderCtrl(sender,getEventCtrl());
+#endif
+}
+
+void EventController::removeEventSenderCtrl(EventSender * sender,EventController * ctrl)
+{
+    std::list<EventListener>::iterator i;
+    i = ctrl->listeners.begin();
+    while (i != ctrl->listeners.end())
+    {
+        if (i->sender == sender)
+            i = ctrl->listeners.erase(i);
+        else
+            i++;
     }
 }
 
 void EventController::sendEvent(const Event & event)
 {
+#ifndef MONO_THREAD
 	std::map<pthread_t, EventController *>::iterator i;
 	for (i = ctrls.begin(); i != ctrls.end(); i++)
 	{
+
         pthread_mutex_lock(&i->second->queueMutex);
-		i->second->eventQueue.push(event);
+        sendEventCtrl(event,i->second);
         pthread_mutex_unlock(&i->second->queueMutex);
 		sem_post(&i->second->queueSem);
-	}
+    }
+#else
+    sendEventCtrl(event,getEventCtrl());
+#endif
+}
+
+void EventController::sendEventCtrl(const Event & event, EventController * ctrl)
+{
+    ctrl->eventQueue.push(event);
+}
+
+void EventController::init()
+{
+#ifndef MONO_THREAD
+    ctrl = getEventCtrl(pthread_self());
+#else
+    ctrl = getEventCtrl();
+#endif
 }
 
 void EventController::run()
+{ 
+    ctrl->run_();
+}
+
+void EventController::runOnce()
 {
-	EventController * ctrl = getEventCtrl(pthread_self());
-	ctrl->run_();
+    ctrl->runOnce_();
 }
 
 void EventController::run_()
 {
     std::list<EventListener>::iterator i;
-	while (1)
-	{
+    while (1)
+    {
         std::list<EventListener> handlerList;
-		sem_wait(&queueSem);
+#ifndef MONO_THREAD
+        sem_wait(&queueSem);
+#endif
         if (eventQueue.size() == 0)
             continue;
+#ifndef MONO_THREAD
         pthread_mutex_lock(&queueMutex);
+#endif
         Event event = eventQueue.front();
         eventQueue.pop();
+#ifndef MONO_THREAD
         pthread_mutex_unlock(&queueMutex);
+#endif
         for (i = listeners.begin(); i != listeners.end(); i++)
             if (i->sender == event.sender)
                 handlerList.push_back(*i);
         for (i = handlerList.begin(); i != handlerList.end(); i++)
             i->handler(&event);
 
-	}
+    }
+}
+
+void EventController::runOnce_()
+{
+    std::list<EventListener>::iterator i;
+    std::list<EventListener> handlerList;
+#ifndef MONO_THREAD
+    sem_wait(&queueSem);
+#endif
+    if (eventQueue.size() == 0)
+        return;
+#ifndef MONO_THREAD
+    pthread_mutex_lock(&queueMutex);
+#endif
+    Event event = eventQueue.front();
+    eventQueue.pop();
+#ifndef MONO_THREAD
+    pthread_mutex_unlock(&queueMutex);
+#endif
+    for (i = listeners.begin(); i != listeners.end(); i++)
+        if (i->sender == event.sender)
+            handlerList.push_back(*i);
+    for (i = handlerList.begin(); i != handlerList.end(); i++)
+        i->handler(&event);
 }
