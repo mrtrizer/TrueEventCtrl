@@ -21,4 +21,6 @@ private:
 	void * parrent;
 };
 
+#define send(arg)sendEvent(&arg,sizeof(arg))
+
 #endif //EVENT_SENDER_H__

@@ -1,11 +1,11 @@
 #ifndef MONO_THREAD
 #include <pthread.h>
 #endif
+#include <assert.h>
 
 #include "eventcontroller.h"
 #include "event.h"
 
-EventController * EventController::ctrl = 0;
 EventController * EventController::monoCtrl = 0;
 
 #ifndef MONO_THREAD
@@ -117,23 +117,22 @@ void EventController::sendEventCtrl(const Event & event, EventController * ctrl)
     ctrl->eventQueue.push(event);
 }
 
-void EventController::init()
-{
-#ifndef MONO_THREAD
-    ctrl = getEventCtrl(pthread_self());
-#else
-    ctrl = getEventCtrl();
-#endif
-}
-
 void EventController::run()
 { 
-    ctrl->run_();
+#ifndef MONO_THREAD
+    getEventCtrl(pthread_self())->run_();
+#else
+    getEventCtrl()->run_();
+#endif
 }
 
 void EventController::runOnce()
 {
-    ctrl->runOnce_();
+#ifndef MONO_THREAD
+    getEventCtrl(pthread_self())->runOnce_();
+#else
+    getEventCtrl()->runOnce_();
+#endif
 }
 
 void EventController::run_()
@@ -167,7 +166,6 @@ void EventController::run_()
 void EventController::runOnce_()
 {
     std::list<EventListener>::iterator i;
-    std::list<EventListener> handlerList;
 #ifndef MONO_THREAD
     sem_wait(&queueSem);
 #endif
@@ -176,14 +174,18 @@ void EventController::runOnce_()
 #ifndef MONO_THREAD
     pthread_mutex_lock(&queueMutex);
 #endif
-    Event event = eventQueue.front();
-    eventQueue.pop();
+    while (eventQueue.size() > 0)
+    {
+        std::list<EventListener> handlerList;
+        Event event = eventQueue.front();
+        eventQueue.pop();
 #ifndef MONO_THREAD
-    pthread_mutex_unlock(&queueMutex);
+        pthread_mutex_unlock(&queueMutex);
 #endif
-    for (i = listeners.begin(); i != listeners.end(); i++)
-        if (i->sender == event.sender)
-            handlerList.push_back(*i);
-    for (i = handlerList.begin(); i != handlerList.end(); i++)
-        i->handler(&event);
+        for (i = listeners.begin(); i != listeners.end(); i++)
+            if (i->sender == event.sender)
+                handlerList.push_back(*i);
+        for (i = handlerList.begin(); i != handlerList.end(); i++)
+            i->handler(&event);
+    }
 }

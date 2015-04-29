@@ -1,2 +1,4 @@
 build*
-tests/eventctrltest.pro.user
+tests/multitheadtest/multithreadtest.pro.user
+tests/simpletest/eventctrltest.pro.user
+

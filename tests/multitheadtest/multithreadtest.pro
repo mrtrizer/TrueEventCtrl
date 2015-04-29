@@ -7,17 +7,20 @@
 QT       += core testlib
 QT       -= gui
 
-include("../src/eventctrl.pri")
+include("../../src/eventctrl.pri")
 
 TARGET = TrueMsgCtrl
 CONFIG   += console
 CONFIG   -= app_bundle
 
-DEFINES += MONO_THREAD
 
 TEMPLATE = app
 
 INCLUDEPATH += "../src/"
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    testeventsender.cpp
+
+HEADERS += \
+    testeventsender.h
 

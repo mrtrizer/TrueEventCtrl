@@ -16,7 +16,6 @@ class EventController
 {
 	friend class EventSender;
 public:
-    static void init();
 	static void run();
     static void runOnce();
 	static void addEventListener(EventSender * sender, void (*handler)(Event *));
@@ -54,7 +53,6 @@ private:
 #else
     static EventController * getEventCtrl();
 #endif
-    static EventController * ctrl;
     static EventController * monoCtrl;
 };
 
