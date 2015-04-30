@@ -158,7 +158,10 @@ void EventController::run_()
             if (i->sender == event.sender)
                 handlerList.push_back(*i);
         for (i = handlerList.begin(); i != handlerList.end(); i++)
+        {
+            event.listener = i->listener;
             i->handler(&event);
+        }
 
     }
 }
@@ -186,6 +189,9 @@ void EventController::runOnce_()
             if (i->sender == event.sender)
                 handlerList.push_back(*i);
         for (i = handlerList.begin(); i != handlerList.end(); i++)
+        {
+            event.listener = i->listener;
             i->handler(&event);
+        }
     }
 }

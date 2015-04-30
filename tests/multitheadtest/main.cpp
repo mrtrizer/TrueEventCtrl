@@ -3,6 +3,7 @@
 #include "eventcontroller.h"
 #include "eventsender.h"
 #include "testeventsender.h"
+#include "testeventlistener.h"
 
 void handler(Event * event)
 {
@@ -14,11 +15,12 @@ int main(int argc, char *argv[])
 {
     (void)argc;
     (void)argv;
+    TestEventListener testEventListener;
     //Create 100 threads for extreme test
     for (int i = 0; i < 100; i++)
     {
         TestEventSender * testEventSender = new TestEventSender; //Thread creating
-        EventController::addEventListener(&testEventSender->eventSender, handler); //Add event listener
+        testEventSender->eventSender.addEventListener(testEventListener.LISTENER(testListener)); //Add event listener
         testEventSender->start(); //And start the therad
     }
 

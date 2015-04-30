@@ -17,12 +17,14 @@ public:
 	void * getArg(){return arg;}
 	int getArgLength(){return argLength;}
 	EventSender * getSender() {return sender;}
+    void * getListener(){return listener;}
 	
 private:
 	void init(EventSender * sender, void * arg, int argLength);
 	EventSender * sender;
 	char * arg;
 	int argLength;
+    void * listener;
 #ifndef MONO_THREAD
 	pthread_mutex_t argMutex;
 #endif

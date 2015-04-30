@@ -9,6 +9,7 @@ void Event::init(EventSender * sender, void * arg, int argLength)
 #endif
 	this->sender = sender;
 	this->arg = new char[argLength];
+    this->listener = 0;
 	memcpy(this->arg, arg, argLength);
 	this->argLength = argLength;
 #ifndef MONO_THREAD

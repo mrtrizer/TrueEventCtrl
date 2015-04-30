@@ -16,7 +16,7 @@ void TestEventSender::run()
 {
     while (1)
     {
-        eventSender.sendEvent(&i,sizeof(unsigned int)); //We send current counter value
+        eventSender.SEND(i); //We send current counter value
         i++;
         sleep(1);
     }

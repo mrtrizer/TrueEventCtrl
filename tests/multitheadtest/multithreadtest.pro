@@ -19,8 +19,10 @@ TEMPLATE = app
 INCLUDEPATH += "../src/"
 
 SOURCES += main.cpp \
-    testeventsender.cpp
+    testeventsender.cpp \
+    testeventlistener.cpp
 
 HEADERS += \
-    testeventsender.h
+    testeventsender.h \
+    testeventlistener.h
 

@@ -21,6 +21,17 @@ private:
 	void * parrent;
 };
 
-#define send(arg)sendEvent(&arg,sizeof(arg))
+#define SEND(arg)sendEvent(&arg,sizeof(arg))
+
+#define ADD_LISTENER(name,class_name) static void name ## _(Event * event)\
+                       {\
+                            ((class_name *)event->getListener())->name(event);\
+                        } \
+                        void name(Event * event)
+
+#define ADD_SENDER(name) EventSender name
+
+#define LISTENER(name) name ## _
+
 
 #endif //EVENT_SENDER_H__

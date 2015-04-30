@@ -23,13 +23,15 @@ public:
     static void removeEventSender(EventSender * sender);
 
 private:
-	class EventListener
-	{
-	public:
-		EventListener(EventSender * sender, void (*handler)(Event *)):handler(handler),sender(sender){}
-		void (*handler)(Event *);
-		EventSender * sender;
-	};
+    class EventListener
+    {
+    public:
+        EventListener(EventSender * sender, void (*handler)(Event *), void *listener = 0):
+            handler(handler),sender(sender), listener(listener){}
+        void (*handler)(Event *);
+        EventSender * sender;
+        void * listener;
+    };
 
 	EventController();
 	EventController(EventController &){}
