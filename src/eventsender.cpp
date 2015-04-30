@@ -9,15 +9,15 @@ EventSender::EventSender(void * parrent):parrent(parrent)
 
 EventSender::~EventSender()
 {
-    EventController::removeEventSender(this);
+    EventCtrl::removeEventSender(this);
 }
 
 void EventSender::sendEvent(void * arg, int argLength)
 {
-	EventController::sendEvent(Event(this, arg,  argLength));
+    EventCtrl::sendEvent(Event(this, arg,  argLength));
 }
 
-void EventSender::addEventListener(void (*handler)(Event *))
+void EventSender::addEventListener(void * listener, void (*handler)(Event *))
 {
-	EventController::addEventListener(this, handler);
+    EventCtrl::addEventListener(this, handler, listener);
 }

@@ -9,7 +9,7 @@ class EventSender;
 
 class Event
 {
-	friend class EventController;
+    friend class EventCtrl;
 public:
 	Event(EventSender * sender, void * arg, int argLength);
 	Event(const Event & event);

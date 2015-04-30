@@ -6,13 +6,13 @@
 #include "eventcontroller.h"
 #include "event.h"
 
-EventController * EventController::monoCtrl = 0;
+EventCtrl * EventCtrl::monoCtrl = 0;
 
 #ifndef MONO_THREAD
-std::map<pthread_t, EventController *> EventController::ctrls;
+std::map<pthread_t, EventCtrl *> EventCtrl::ctrls;
 #endif
 
-EventController::EventController()
+EventCtrl::EventCtrl()
 {
 #ifndef MONO_THREAD
     sem_init(&queueSem, 0, 0);
@@ -20,7 +20,7 @@ EventController::EventController()
 #endif
 }
 
-EventController::~EventController()
+EventCtrl::~EventCtrl()
 {
 #ifndef MONO_THREAD
     sem_destroy(&queueSem);
@@ -29,49 +29,49 @@ EventController::~EventController()
 }
 
 #ifndef MONO_THREAD
-EventController * EventController::getEventCtrl(pthread_t id)
+EventCtrl * EventCtrl::getEventCtrl(pthread_t id)
 {
-	EventController * ctrl;
-	std::map<pthread_t,EventController *>::iterator i;
+    EventCtrl * ctrl;
+    std::map<pthread_t,EventCtrl *>::iterator i;
 	
 	if ((i = ctrls.find(id)) != ctrls.end())
 		ctrl = i->second;
 	else
-		ctrl = ctrls[id] = new EventController();
+        ctrl = ctrls[id] = new EventCtrl();
 		
 	return ctrl;	
 }
 
 #else
 
-EventController * EventController::getEventCtrl()
+EventCtrl * EventCtrl::getEventCtrl()
 {
     if (monoCtrl == 0)
-        monoCtrl = new EventController();
+        monoCtrl = new EventCtrl();
     return monoCtrl;
 }
 
 #endif
 
-void EventController::addEventListener(EventSender * sender, void (*handler) (Event * event))
+void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * event), void * listener)
 {
-    EventController * ctrl;
+    EventCtrl * ctrl;
 #ifndef MONO_THREAD
     ctrl = getEventCtrl(pthread_self());
 #else
     ctrl = getEventCtrl();
 #endif
-	std::list<EventListener>::iterator i;
-	for (i = ctrl->listeners.begin(); i != ctrl->listeners.end(); i++)
+    std::list<EventListener>::iterator i;
+    for (i = ctrl->listeners.begin(); i != ctrl->listeners.end(); i++)
         if ((i->sender == sender) && (i->handler == handler))
-			return;
-	ctrl->listeners.push_back(EventListener(sender, handler));
+            return;
+    ctrl->listeners.push_back(EventListener(sender, handler, listener));
 }
 
-void EventController::removeEventSender(EventSender * sender)
+void EventCtrl::removeEventSender(EventSender * sender)
 {
 #ifndef MONO_THREAD
-    std::map<pthread_t, EventController *>::iterator ctrl;
+    std::map<pthread_t, EventCtrl *>::iterator ctrl;
 
     for (ctrl = ctrls.begin(); ctrl != ctrls.end(); ctrl++)
     {
@@ -82,7 +82,7 @@ void EventController::removeEventSender(EventSender * sender)
 #endif
 }
 
-void EventController::removeEventSenderCtrl(EventSender * sender,EventController * ctrl)
+void EventCtrl::removeEventSenderCtrl(EventSender * sender,EventCtrl * ctrl)
 {
     std::list<EventListener>::iterator i;
     i = ctrl->listeners.begin();
@@ -95,10 +95,10 @@ void EventController::removeEventSenderCtrl(EventSender * sender,EventController
     }
 }
 
-void EventController::sendEvent(const Event & event)
+void EventCtrl::sendEvent(const Event & event)
 {
 #ifndef MONO_THREAD
-	std::map<pthread_t, EventController *>::iterator i;
+    std::map<pthread_t, EventCtrl *>::iterator i;
 	for (i = ctrls.begin(); i != ctrls.end(); i++)
 	{
 
@@ -112,12 +112,12 @@ void EventController::sendEvent(const Event & event)
 #endif
 }
 
-void EventController::sendEventCtrl(const Event & event, EventController * ctrl)
+void EventCtrl::sendEventCtrl(const Event & event, EventCtrl * ctrl)
 {
     ctrl->eventQueue.push(event);
 }
 
-void EventController::run()
+void EventCtrl::run()
 { 
 #ifndef MONO_THREAD
     getEventCtrl(pthread_self())->run_();
@@ -126,7 +126,7 @@ void EventController::run()
 #endif
 }
 
-void EventController::runOnce()
+void EventCtrl::runOnce()
 {
 #ifndef MONO_THREAD
     getEventCtrl(pthread_self())->runOnce_();
@@ -135,7 +135,7 @@ void EventController::runOnce()
 #endif
 }
 
-void EventController::run_()
+void EventCtrl::run_()
 {
     while (1)
     {
@@ -157,7 +157,7 @@ void EventController::run_()
     }
 }
 
-void EventController::runOnce_()
+void EventCtrl::runOnce_()
 {
 
 #ifndef MONO_THREAD
@@ -180,7 +180,7 @@ void EventController::runOnce_()
     }
 }
 
-void EventController::send(Event & event)
+void EventCtrl::send(Event & event)
 {
     HandlerList handlerList;
     HandlerList::iterator i;

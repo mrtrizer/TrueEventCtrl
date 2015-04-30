@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
     (void)argv;
     QString str = "test"; //Example string argument
     EventSender eventSender; //Event sender
-    EventController::addEventListener(&eventSender, handler); //Adding event listener
+    eventSender.addEventListener(0,handler); //Adding event listener
 
     //You can use two form for event sending.
     eventSender.sendEvent((void*)&str,sizeof(str));
     eventSender.SEND(str); //Event emiting
-    EventController::runOnce(); //Runing single queue checking.
+    EventCtrl::runOnce(); //Runing single queue checking.
     return 0;
 }

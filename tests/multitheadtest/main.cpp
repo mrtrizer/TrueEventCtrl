@@ -20,10 +20,10 @@ int main(int argc, char *argv[])
     for (int i = 0; i < 100; i++)
     {
         TestEventSender * testEventSender = new TestEventSender; //Thread creating
-        testEventSender->eventSender.addEventListener(testEventListener.LISTENER(testListener)); //Add event listener
+        testEventSender->eventSender.addEventListener(&testEventListener,testEventListener.LISTENER(testListener)); //Add event listener
         testEventSender->start(); //And start the therad
     }
 
-    EventController::run();
+    EventCtrl::run();
     return 0;
 }

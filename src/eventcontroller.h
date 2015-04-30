@@ -12,13 +12,13 @@
 class EventSender;
 class Event;
 
-class EventController
+class EventCtrl
 {
 	friend class EventSender;
 public:
 	static void run();
     static void runOnce();
-	static void addEventListener(EventSender * sender, void (*handler)(Event *));
+    static void addEventListener(EventSender * sender, void (*handler)(Event *), void * listener);
 	static void sendEvent(const Event & event);
     static void removeEventSender(EventSender * sender);
 
@@ -35,15 +35,15 @@ private:
 
     typedef std::list<EventListener> HandlerList;
 
-	EventController();
-	EventController(EventController &){}
-    ~EventController();
+    EventCtrl();
+    EventCtrl(EventCtrl &){}
+    ~EventCtrl();
 	
 	void run_();
     void runOnce_();
     void send(Event &event);
-    static void removeEventSenderCtrl(EventSender *sender, EventController * ctrl);
-    static void sendEventCtrl(const Event & event, EventController * ctrl);
+    static void removeEventSenderCtrl(EventSender *sender, EventCtrl * ctrl);
+    static void sendEventCtrl(const Event & event, EventCtrl * ctrl);
 	
 #ifndef MONO_THREAD
 	sem_t queueSem;
@@ -53,12 +53,12 @@ private:
 	std::list<EventListener> listeners;
 	std::queue<Event> eventQueue;
 #ifndef MONO_THREAD
-	static std::map<pthread_t, EventController *> ctrls;
-	static EventController * getEventCtrl(pthread_t id);
+    static std::map<pthread_t, EventCtrl *> ctrls;
+    static EventCtrl * getEventCtrl(pthread_t id);
 #else
-    static EventController * getEventCtrl();
+    static EventCtrl * getEventCtrl();
 #endif
-    static EventController * monoCtrl;
+    static EventCtrl * monoCtrl;
 };
 
 #endif //EVENT_CONTROLLER
