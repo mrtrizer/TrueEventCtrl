@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
     //You can use two form for event sending.
     eventSender.sendEvent((void*)&str,sizeof(str));
-    eventSender.send(str); //Event emiting
+    eventSender.SEND(str); //Event emiting
     EventController::runOnce(); //Runing single queue checking.
     return 0;
 }
