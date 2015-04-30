@@ -9,8 +9,12 @@ public:
     TestEventListener();
     ~TestEventListener();
 
-    ADD_LISTENER(testListener,TestEventListener);
+    //Listener method
+    void testListener(Event *event);
 
+    //Register the listener method. It have to be in the public section.
+    //And must get the class name in second argument.
+    ADD_LISTENER(testListener,TestEventListener)
 };
 
 #endif // TESTEVENTLISTENER_H

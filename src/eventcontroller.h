@@ -33,12 +33,15 @@ private:
         void * listener;
     };
 
+    typedef std::list<EventListener> HandlerList;
+
 	EventController();
 	EventController(EventController &){}
     ~EventController();
 	
 	void run_();
     void runOnce_();
+    void send(Event &event);
     static void removeEventSenderCtrl(EventSender *sender, EventController * ctrl);
     static void sendEventCtrl(const Event & event, EventController * ctrl);
 	

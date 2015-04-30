@@ -137,10 +137,8 @@ void EventController::runOnce()
 
 void EventController::run_()
 {
-    std::list<EventListener>::iterator i;
     while (1)
     {
-        std::list<EventListener> handlerList;
 #ifndef MONO_THREAD
         sem_wait(&queueSem);
 #endif
@@ -154,21 +152,14 @@ void EventController::run_()
 #ifndef MONO_THREAD
         pthread_mutex_unlock(&queueMutex);
 #endif
-        for (i = listeners.begin(); i != listeners.end(); i++)
-            if (i->sender == event.sender)
-                handlerList.push_back(*i);
-        for (i = handlerList.begin(); i != handlerList.end(); i++)
-        {
-            event.listener = i->listener;
-            i->handler(&event);
-        }
+        send(event);
 
     }
 }
 
 void EventController::runOnce_()
 {
-    std::list<EventListener>::iterator i;
+
 #ifndef MONO_THREAD
     sem_wait(&queueSem);
 #endif
@@ -179,19 +170,26 @@ void EventController::runOnce_()
 #endif
     while (eventQueue.size() > 0)
     {
-        std::list<EventListener> handlerList;
+
         Event event = eventQueue.front();
         eventQueue.pop();
 #ifndef MONO_THREAD
         pthread_mutex_unlock(&queueMutex);
 #endif
-        for (i = listeners.begin(); i != listeners.end(); i++)
-            if (i->sender == event.sender)
-                handlerList.push_back(*i);
-        for (i = handlerList.begin(); i != handlerList.end(); i++)
-        {
-            event.listener = i->listener;
-            i->handler(&event);
-        }
+        send(event);
+    }
+}
+
+void EventController::send(Event & event)
+{
+    HandlerList handlerList;
+    HandlerList::iterator i;
+    for (i = listeners.begin(); i != listeners.end(); i++)
+        if (i->sender == event.sender)
+            handlerList.push_back(*i);
+    for (i = handlerList.begin(); i != handlerList.end(); i++)
+    {
+        event.listener = i->listener;
+        i->handler(&event);
     }
 }

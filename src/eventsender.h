@@ -26,8 +26,7 @@ private:
 #define ADD_LISTENER(name,class_name) static void name ## _(Event * event)\
                        {\
                             ((class_name *)event->getListener())->name(event);\
-                        } \
-                        void name(Event * event)
+                        }
 
 #define ADD_SENDER(name) EventSender name
 
