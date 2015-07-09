@@ -20,9 +20,11 @@ INCLUDEPATH += "../src/"
 
 SOURCES += main.cpp \
     testeventsender.cpp \
-    testeventlistener.cpp
+    testeventlistener.cpp \
+    testeventlistener2.cpp
 
 HEADERS += \
     testeventsender.h \
-    testeventlistener.h
+    testeventlistener.h \
+    testeventlistener2.h
 
