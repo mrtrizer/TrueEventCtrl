@@ -1,9 +1,9 @@
 INCLUDEPATH  += $$PWD
 
 HEADERS += $$PWD/event.h \
-	$$PWD/eventcontroller.h \
-	$$PWD/eventsender.h
+	$$PWD/eventsender.h \
+    $$PWD/eventctrl.h
 
 SOURCES += $$PWD/event.cpp \
-	$$PWD/eventcontroller.cpp \
-        $$PWD/eventsender.cpp
+        $$PWD/eventsender.cpp \
+    $$PWD/eventctrl.cpp

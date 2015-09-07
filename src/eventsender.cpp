@@ -1,5 +1,5 @@
 #include "eventsender.h"
-#include "eventcontroller.h"
+#include "eventctrl.h"
 #include "event.h"
 
 EventSender::EventSender(void * parrent):parrent(parrent)
