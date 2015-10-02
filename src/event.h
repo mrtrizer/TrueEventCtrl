@@ -11,7 +11,7 @@ class Event
 {
     friend class EventCtrl;
 public:
-	Event(EventSender * sender, void * arg, int argLength);
+    Event(EventSender * sender, const void * arg, int argLength);
 	Event(const Event & event);
 	~Event();
 	void * getArg(){return arg;}
@@ -20,7 +20,7 @@ public:
     void * getListener(){return listener;}
 	
 private:
-	void init(EventSender * sender, void * arg, int argLength);
+    void init(EventSender * sender, const void * arg, int argLength);
 	EventSender * sender;
 	char * arg;
 	int argLength;

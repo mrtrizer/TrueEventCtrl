@@ -12,7 +12,7 @@ EventSender::~EventSender()
     EventCtrl::removeEventSender(this);
 }
 
-void EventSender::sendEvent(void * arg, int argLength)
+void EventSender::sendEvent(const void * arg, int argLength)
 {
     EventCtrl::sendEvent(Event(this, arg,  argLength));
 }

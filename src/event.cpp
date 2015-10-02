@@ -1,7 +1,7 @@
 #include <string.h>
 #include "event.h"
 
-void Event::init(EventSender * sender, void * arg, int argLength)
+void Event::init(EventSender * sender, const void * arg, int argLength)
 {
 #ifndef MONO_THREAD
 	pthread_mutex_init(&argMutex, NULL);
@@ -17,7 +17,7 @@ void Event::init(EventSender * sender, void * arg, int argLength)
 #endif
 }
 
-Event::Event(EventSender * sender, void * arg, int argLength)
+Event::Event(EventSender * sender, const void * arg, int argLength)
 {
 	init(sender, arg, argLength);
 }
