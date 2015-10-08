@@ -13,7 +13,7 @@ class EventSender
 public:
 	EventSender(void * parrent = 0);
 	~EventSender();
-	void sendEvent(void * arg = 0, int argLength = 0);
+    void sendEvent(const void * arg = 0, int argLength = 0);
     void addEventListener(void *listener, void (*handler)(Event *));
 	void * getParrent(){return parrent;}
 	
