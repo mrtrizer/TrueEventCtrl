@@ -16,9 +16,11 @@ class EventCtrl
 {
 	friend class EventSender;
 public:
+    enum ConnectionType {DIRECT, QUEUE};
+
 	static void run();
     static void runOnce();
-    static void addEventListener(EventSender * sender, void (*handler)(Event *), void * listener);
+    static void addEventListener(EventSender * sender, void (*handler)(Event *), void * listener, ConnectionType connectionType);
 	static void sendEvent(const Event & event);
     static void removeEventSender(EventSender * sender);
 
@@ -26,14 +28,19 @@ private:
     class EventListener
     {
     public:
-        EventListener(EventSender * sender, void (*handler)(Event *), void *listener = 0):
-            handler(handler),sender(sender), listener(listener){}
+        EventListener(EventSender * sender, void (*handler)(Event *), void *listener = 0, ConnectionType connectionType = QUEUE):
+            handler(handler),sender(sender), listener(listener), connectionType(connectionType){}
         void (*handler)(Event *);
         EventSender * sender;
         void * listener;
+        ConnectionType connectionType;
     };
 
-    typedef std::list<EventListener> HandlerList;
+    typedef std::list<EventListener> EventListenerList;
+    typedef std::queue<Event> EventQueue;
+#ifndef MONO_THREAD
+    typedef std::map<pthread_t, EventCtrl *> EventCtrlMap;
+#endif
 
     EventCtrl();
     EventCtrl(EventCtrl &){}
@@ -42,6 +49,7 @@ private:
 	void run_();
     void runOnce_();
     void send(Event &event);
+    int sendDirect(const Event &event);
     static void removeEventSenderCtrl(EventSender *sender, EventCtrl * ctrl);
     static void sendEventCtrl(const Event & event, EventCtrl * ctrl);
 	
@@ -50,10 +58,10 @@ private:
     pthread_mutex_t queueMutex;
 #endif
 
-	std::list<EventListener> listeners;
-	std::queue<Event> eventQueue;
+    EventListenerList listeners;
+    EventQueue eventQueue;
 #ifndef MONO_THREAD
-    static std::map<pthread_t, EventCtrl *> ctrls;
+    static EventCtrlMap ctrls;
     static EventCtrl * getEventCtrl(pthread_t id);
 #else
     static EventCtrl * getEventCtrl();

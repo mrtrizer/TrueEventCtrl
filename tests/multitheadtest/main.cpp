@@ -1,6 +1,6 @@
 #include <QDebug>
 #include "event.h"
-#include "eventcontroller.h"
+#include "eventctrl.h"
 #include "eventsender.h"
 #include "testeventsender.h"
 #include "testeventlistener2.h"

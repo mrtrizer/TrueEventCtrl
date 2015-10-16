@@ -17,7 +17,7 @@ void EventSender::sendEvent(const void * arg, int argLength)
     EventCtrl::sendEvent(Event(this, arg,  argLength));
 }
 
-void EventSender::addEventListener(void * listener, void (*handler)(Event *))
+void EventSender::addEventListener(void * listener, void (*handler)(Event *), EventCtrl::ConnectionType connectionType)
 {
-    EventCtrl::addEventListener(this, handler, listener);
+    EventCtrl::addEventListener(this, handler, listener, connectionType);
 }

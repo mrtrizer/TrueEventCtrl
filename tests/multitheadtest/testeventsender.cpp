@@ -1,6 +1,6 @@
 #include "testeventsender.h"
 #include "event.h"
-#include "eventcontroller.h"
+#include "eventctrl.h"
 
 TestEventSender::TestEventSender():i(0)
 {
