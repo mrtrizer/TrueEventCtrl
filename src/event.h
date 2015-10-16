@@ -25,9 +25,6 @@ private:
 	char * arg;
 	int argLength;
     void * listener;
-#ifndef MONO_THREAD
-	pthread_mutex_t argMutex;
-#endif
 };
 
 #endif //EVENT_H__

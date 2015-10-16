@@ -9,7 +9,7 @@
 EventCtrl * EventCtrl::monoCtrl = 0;
 
 #ifndef MONO_THREAD
-std::map<pthread_t, EventCtrl *> EventCtrl::ctrls;
+EventCtrl::EventCtrlMap EventCtrl::ctrls;
 #endif
 
 EventCtrl::EventCtrl()
@@ -32,7 +32,7 @@ EventCtrl::~EventCtrl()
 EventCtrl * EventCtrl::getEventCtrl(pthread_t id)
 {
     EventCtrl * ctrl;
-    std::map<pthread_t,EventCtrl *>::iterator i;
+    EventCtrlMap::iterator i;
 	
 	if ((i = ctrls.find(id)) != ctrls.end())
 		ctrl = i->second;
@@ -61,7 +61,7 @@ void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * 
 #else
     ctrl = getEventCtrl();
 #endif
-    std::list<EventListener>::iterator i;
+    EventListenerList::iterator i;
     for (i = ctrl->listeners.begin(); i != ctrl->listeners.end(); i++)
         if ((i->sender == sender) && (i->handler == handler))
             return;
@@ -71,7 +71,7 @@ void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * 
 void EventCtrl::removeEventSender(EventSender * sender)
 {
 #ifndef MONO_THREAD
-    std::map<pthread_t, EventCtrl *>::iterator ctrl;
+    EventCtrlMap::iterator ctrl;
 
     for (ctrl = ctrls.begin(); ctrl != ctrls.end(); ctrl++)
     {
@@ -84,7 +84,7 @@ void EventCtrl::removeEventSender(EventSender * sender)
 
 void EventCtrl::removeEventSenderCtrl(EventSender * sender,EventCtrl * ctrl)
 {
-    std::list<EventListener>::iterator i;
+    EventListenerList::iterator i;
     i = ctrl->listeners.begin();
     while (i != ctrl->listeners.end())
     {
@@ -98,7 +98,7 @@ void EventCtrl::removeEventSenderCtrl(EventSender * sender,EventCtrl * ctrl)
 void EventCtrl::sendEvent(const Event & event)
 {
 #ifndef MONO_THREAD
-    std::map<pthread_t, EventCtrl *>::iterator i;
+    EventCtrlMap::iterator i;
 	for (i = ctrls.begin(); i != ctrls.end(); i++)
 	{
         if (i->second->sendDirect(event) == 0)
@@ -172,7 +172,6 @@ void EventCtrl::runOnce_()
 #endif
     while (eventQueue.size() > 0)
     {
-
         Event event = eventQueue.front();
         eventQueue.pop();
 #ifndef MONO_THREAD
@@ -184,8 +183,8 @@ void EventCtrl::runOnce_()
 
 void EventCtrl::send(Event & event)
 {
-    HandlerList handlerList;
-    HandlerList::iterator i;
+    EventListenerList handlerList;
+    EventListenerList::iterator i;
     for (i = listeners.begin(); i != listeners.end(); i++)
         if (i->sender == event.sender)
             handlerList.push_back(*i);
@@ -198,8 +197,8 @@ void EventCtrl::send(Event & event)
 
 int EventCtrl::sendDirect(const Event & event)
 {
-    HandlerList handlerList;
-    HandlerList::iterator i;
+    EventListenerList handlerList;
+    EventListenerList::iterator i;
     int notDirectCounter = 0;
     for (i = listeners.begin(); i != listeners.end(); i++)
         if ((i->sender == event.sender))

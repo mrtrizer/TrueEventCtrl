@@ -36,7 +36,11 @@ private:
         ConnectionType connectionType;
     };
 
-    typedef std::list<EventListener> HandlerList;
+    typedef std::list<EventListener> EventListenerList;
+    typedef std::queue<Event> EventQueue;
+#ifndef MONO_THREAD
+    typedef std::map<pthread_t, EventCtrl *> EventCtrlMap;
+#endif
 
     EventCtrl();
     EventCtrl(EventCtrl &){}
@@ -54,10 +58,10 @@ private:
     pthread_mutex_t queueMutex;
 #endif
 
-	std::list<EventListener> listeners;
-	std::queue<Event> eventQueue;
+    EventListenerList listeners;
+    EventQueue eventQueue;
 #ifndef MONO_THREAD
-    static std::map<pthread_t, EventCtrl *> ctrls;
+    static EventCtrlMap ctrls;
     static EventCtrl * getEventCtrl(pthread_t id);
 #else
     static EventCtrl * getEventCtrl();
