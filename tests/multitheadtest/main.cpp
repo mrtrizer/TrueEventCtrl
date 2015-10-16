@@ -1,6 +1,6 @@
 #include <QDebug>
 #include "event.h"
-#include "eventcontroller.h"
+#include "eventctrl.h"
 #include "eventsender.h"
 #include "testeventsender.h"
 #include "testeventlistener2.h"
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     (void)argv;
     TestEventListener2 testEventListener;
     //Create 100 threads for extreme test
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1; i++)
     {
         TestEventSender * testEventSender = new TestEventSender; //Thread creating
         testEventSender->eventSender.addEventListener(&testEventListener,testEventListener.LISTENER(testListener)); //Add event listener

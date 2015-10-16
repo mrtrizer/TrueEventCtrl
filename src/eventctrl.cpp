@@ -53,7 +53,7 @@ EventCtrl * EventCtrl::getEventCtrl()
 
 #endif
 
-void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * event), void * listener)
+void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * event), void * listener, ConnectionType connectionType)
 {
     EventCtrl * ctrl;
 #ifndef MONO_THREAD
@@ -65,7 +65,7 @@ void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * 
     for (i = ctrl->listeners.begin(); i != ctrl->listeners.end(); i++)
         if ((i->sender == sender) && (i->handler == handler))
             return;
-    ctrl->listeners.push_back(EventListener(sender, handler, listener));
+    ctrl->listeners.push_back(EventListener(sender, handler, listener, connectionType));
 }
 
 void EventCtrl::removeEventSender(EventSender * sender)
@@ -101,13 +101,15 @@ void EventCtrl::sendEvent(const Event & event)
     std::map<pthread_t, EventCtrl *>::iterator i;
 	for (i = ctrls.begin(); i != ctrls.end(); i++)
 	{
-
+        if (i->second->sendDirect(event) == 0)
+            continue;
         pthread_mutex_lock(&i->second->queueMutex);
         sendEventCtrl(event,i->second);
         pthread_mutex_unlock(&i->second->queueMutex);
 		sem_post(&i->second->queueSem);
     }
 #else
+    getEventCtrl()->sendDirect(event);
     sendEventCtrl(event,getEventCtrl());
 #endif
 }
@@ -192,4 +194,27 @@ void EventCtrl::send(Event & event)
         event.listener = i->listener;
         i->handler(&event);
     }
+}
+
+int EventCtrl::sendDirect(const Event & event)
+{
+    HandlerList handlerList;
+    HandlerList::iterator i;
+    int notDirectCounter = 0;
+    for (i = listeners.begin(); i != listeners.end(); i++)
+        if ((i->sender == event.sender))
+        {
+            if (i->connectionType == DIRECT)
+                handlerList.push_back(*i);
+            else
+                notDirectCounter++;
+        }
+    if (handlerList.size() != 0)
+        for (i = handlerList.begin(); i != handlerList.end(); i++)
+        {
+            Event eventTmp(event);
+            eventTmp.listener = i->listener;
+            i->handler(&eventTmp);
+        }
+    return notDirectCounter;
 }

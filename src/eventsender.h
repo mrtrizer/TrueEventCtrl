@@ -4,8 +4,7 @@
 #include <list>
 
 #include "event.h"
-
-class EventCtrl;
+#include "eventctrl.h"
 
 class EventSender
 {
@@ -14,7 +13,7 @@ public:
 	EventSender(void * parrent = 0);
 	~EventSender();
     void sendEvent(const void * arg = 0, int argLength = 0);
-    void addEventListener(void *listener, void (*handler)(Event *));
+    void addEventListener(void *listener, void (*handler)(Event *), EventCtrl::ConnectionType connectionType = EventCtrl::QUEUE);
 	void * getParrent(){return parrent;}
 	
 private:

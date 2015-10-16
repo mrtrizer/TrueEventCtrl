@@ -1,6 +1,6 @@
 #include <QDebug>
 #include "event.h"
-#include "eventcontroller.h"
+#include "eventctrl.h"
 #include "eventsender.h"
 
 void handler(Event * event)
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     (void)argv;
     QString str = "test"; //Example string argument
     EventSender eventSender; //Event sender
-    eventSender.addEventListener(0,handler); //Adding event listener
+    eventSender.addEventListener(0,handler,EventCtrl::DIRECT); //Adding event listener
 
     //You can use two form for event sending.
     eventSender.sendEvent((void*)&str,sizeof(str));
