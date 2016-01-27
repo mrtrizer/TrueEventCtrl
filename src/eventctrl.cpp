@@ -161,7 +161,7 @@ void EventCtrl::runOnce_()
 {
 
 #ifndef MONO_THREAD
-    sem_wait(&queueSem);
+    sem_trywait(&queueSem);
 #endif
     if (eventQueue.size() == 0)
         return;

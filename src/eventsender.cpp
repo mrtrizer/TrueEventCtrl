@@ -1,6 +1,11 @@
 #include "eventsender.h"
 #include "eventctrl.h"
 #include "event.h"
+#include "assert.h"
+
+#ifdef __GXX_RTTI
+#include <typeinfo>
+#endif
 
 EventSender::EventSender(void * parrent):parrent(parrent)
 {
@@ -19,5 +24,9 @@ void EventSender::sendEvent(const void * arg, int argLength)
 
 void EventSender::addEventListener(void * listener, void (*handler)(Event *))
 {
+#ifdef __GXX_RTTI
+    assert(typeid(this).hash_code() == typeid(EventSender*).hash_code());
+#endif
+
     EventCtrl::addEventListener(this, handler, listener);
 }
