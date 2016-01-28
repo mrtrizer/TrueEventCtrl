@@ -6,7 +6,7 @@
 class TestEventListener
 {
 public:
-    TestEventListener();
+    TestEventListener(int n);
     ~TestEventListener();
 
     //Listener method
@@ -18,6 +18,10 @@ public:
     //And must get the class name in second argument.
     ADD_LISTENER(testListener,TestEventListener)
     ADD_LISTENER(abatractTestListener,TestEventListener)
+
+private:
+    int n;
+
 };
 
 #endif // TESTEVENTLISTENER_H

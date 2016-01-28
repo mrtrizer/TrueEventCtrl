@@ -1,7 +1,7 @@
 #include "testeventlistener2.h"
 #include <QDebug>
 
-TestEventListener2::TestEventListener2()
+TestEventListener2::TestEventListener2(int n):TestEventListener(n)
 {
 
 }

@@ -1,7 +1,7 @@
 #include "testeventlistener.h"
 #include <QDebug>
 
-TestEventListener::TestEventListener()
+TestEventListener::TestEventListener(int n):n(n)
 {
 
 }
@@ -13,6 +13,5 @@ TestEventListener::~TestEventListener()
 
 void TestEventListener::testListener(Event *event)
 {
-    qDebug() << "Event";
-    qDebug() << *(int *)event->getArg();
+    qDebug() << "Listener" << n << "| Event" << *(int *)event->getArg();
 }

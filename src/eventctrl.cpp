@@ -63,7 +63,7 @@ void EventCtrl::addEventListener(EventSender * sender, void (*handler) (Event * 
 #endif
     EventListenerList::iterator i;
     for (i = ctrl->listeners.begin(); i != ctrl->listeners.end(); i++)
-        if ((i->sender == sender) && (i->handler == handler))
+        if ((i->sender == sender) && (i->handler == handler) && (i->listener == listener))
             return;
     ctrl->listeners.push_back(EventListener(sender, handler, listener, connectionType));
 }
@@ -163,7 +163,7 @@ void EventCtrl::runOnce_()
 {
 
 #ifndef MONO_THREAD
-    sem_wait(&queueSem);
+    sem_trywait(&queueSem);
 #endif
     if (eventQueue.size() == 0)
         return;
