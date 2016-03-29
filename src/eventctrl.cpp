@@ -1,10 +1,6 @@
-#ifndef MONO_THREAD
-#include <pthread.h>
-#endif
 #include <assert.h>
 
 #include "eventctrl.h"
-#include "event.h"
 
 EventCtrl * EventCtrl::monoCtrl = 0;
 
