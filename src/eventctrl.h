@@ -8,9 +8,9 @@
 #include <list>
 #include <queue>
 #include <map>
+#include "event.h"
 
 class EventSender;
-class Event;
 
 class EventCtrl
 {
@@ -20,7 +20,7 @@ public:
 
 	static void run();
     static void runOnce();
-    static void addEventListener(EventSender * sender, void (*handler)(Event *), void * listener, ConnectionType connectionType);
+	static void addEventListener(EventSender * sender, void(*handler)(Event *), void * listener, ConnectionType connectionType);
 	static void sendEvent(const Event & event);
     static void removeEventSender(EventSender * sender);
 
@@ -39,7 +39,19 @@ private:
     typedef std::list<EventListener> EventListenerList;
     typedef std::queue<Event> EventQueue;
 #ifndef MONO_THREAD
-    typedef std::map<pthread_t, EventCtrl *> EventCtrlMap;
+	struct ThreadComparerForMap
+	{
+		bool operator()(const pthread_t x, const pthread_t y)
+		{
+#ifdef _MSC_VER
+            return x.x> y.x;
+#else
+            return x > y;
+#endif
+		}
+	};
+
+	typedef std::map<pthread_t, EventCtrl *, ThreadComparerForMap> EventCtrlMap;
 #endif
 
     EventCtrl();
