@@ -44,11 +44,11 @@ private:
 	{
 		bool operator()(const pthread_t x, const pthread_t y)
 		{
-        #ifdef _MSC_VER
-				return x.x> y.x;
-		#else
-				return x > y;
-		#endif            
+#ifdef _MSC_VER
+            return x.x> y.x;
+#else
+            return x > y;
+#endif
 		}
 	};
 
