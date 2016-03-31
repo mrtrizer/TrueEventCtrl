@@ -8,7 +8,6 @@
 #include <list>
 #include <queue>
 #include <map>
-#include <tuple>
 #include "event.h"
 
 class EventSender;
@@ -21,7 +20,7 @@ public:
 
 	static void run();
     static void runOnce();
-	static void addEventListener(EventSender * sender, void(*handler) (Event * event), void * listener, ConnectionType connectionType);
+	static void addEventListener(EventSender * sender, void(*handler)(Event *), void * listener, ConnectionType connectionType);
 	static void sendEvent(const Event & event);
     static void removeEventSender(EventSender * sender);
 
